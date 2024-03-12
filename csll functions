@@ -1,0 +1,178 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+typedef struct node
+{
+    int data;
+    struct node *link;
+}*N;
+
+N create_node()
+{
+    N newnode=(N)malloc(sizeof(struct node));
+    if(newnode==NULL)
+        printf("Memory not allocated\n");
+    else
+    {
+        scanf("%d",&newnode->data);
+        newnode->link=newnode;
+    }
+    return newnode;
+}
+void display_csll(N head)
+{
+    N cur=NULL;
+    if(head==NULL)
+        printf("Circular list empty\n");
+    else 
+    {
+        cur=head;
+        do{
+            printf("%d ",cur->data);
+            cur=cur->link;
+        }while(cur!=head);
+    }
+}
+
+int count_nodes(N head)
+{
+    int count=0;
+    struct node *cur=NULL;
+    if(head==NULL)
+        return count;
+    else
+    {
+        cur=head;
+        do
+        {
+            count++;
+            cur=cur->link;
+        }
+        while(cur!=head);
+    }
+    return count;
+}
+
+N insert_front_csll(N head)
+{
+    N cur=NULL;
+    N newnode=create_node();
+    if(head==NULL)
+        head=newnode;
+    else
+    {
+        cur=head;
+        while(cur->link!=head)
+            cur=cur->link;
+        newnode->link=head;
+        cur->link=newnode;
+        head=newnode;
+    }
+    return head;
+}
+N insert_position_csll(N head,N newnode,int pos)
+{
+    N cur=NULL;
+    int count=count_nodes(head);
+    if(head==NULL)
+        return NULL;
+    else if(pos<=1)
+    {
+        cur=head;
+        while(cur->link!=head)
+            cur=cur->link;
+        cur->link=newnode;
+        newnode->link=head;
+        head=newnode;
+    }
+    else if(pos>=count+1)
+    {
+        cur=head;
+        while(cur->link!=head)
+            cur=cur->link;
+        cur->link=newnode;
+        newnode->link=head;
+    }
+    else if(pos>1&&pos<=count)
+    {
+        cur=head;
+        for(int i=1;i<pos-1;i++)
+            cur=cur->link;
+        newnode->link=cur->link;
+        cur->link=newnode;
+    }
+    return head;
+}
+
+N delete_position_csll(N head,int pos)
+{
+    N cur=NULL,prev=NULL,temp=NULL;
+    int count=count_nodes(head);
+    if(head==NULL)
+        return NULL;
+    else if(head->link==head&&pos==1)
+    {
+        free(head);
+        head=NULL;
+    }
+    else if(pos<=1)
+    {
+        cur=head;
+        while(cur->link!=head)
+            cur=cur->link;
+        temp=head;
+        cur->link=head->link;
+        head=head->link;
+        free(temp);
+    }
+    else if(pos==count)
+    {
+        cur=head;
+        while(cur->link!=head)
+        {
+            prev=cur;
+            cur=cur->link;
+        }
+        prev->link=head;
+        free(cur);
+    }
+    else if(pos>1&&pos<count)
+    {
+        cur=head;
+        for(int i=1;i<pos;i++)
+        {
+            prev=cur;
+            cur=cur->link;
+        }
+        prev->link=cur->link;
+        free(cur);
+    }
+    return head;
+}
+
+int main() 
+{  
+    N head=NULL,newnode;
+    int n,p,q;
+    scanf("%d",&n);
+    if(n>=1)
+    {
+        for(int i=0;i<n;i++)
+            head=insert_front_csll(head);
+        scanf("%d",&p);
+        newnode=create_node();
+        scanf("%d",&q);
+        printf("Circular list is: ");
+        display_csll(head);
+        head=insert_position_csll(head,newnode,p);
+        printf("\n\nCircular list after insertion is: ");
+        display_csll(head);
+        head=delete_position_csll(head,q);
+        printf("\n\nCircular list after deletion is: ");
+        display_csll(head);
+    }
+    else
+        printf("Invalid input\n");
+    return 0;
+}
